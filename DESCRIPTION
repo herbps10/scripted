@@ -1,0 +1,18 @@
+Package: scripted 
+Type: Package
+Title: A package for running scripts with dependencies.
+Version: 0.0.1
+Date: 2018-08-22
+Authors@R: person("Krzysztof", "Sakrejda", email = "<k@fawkes.io>", role = c("cre", "aut"))
+Description: Run simple R scripts with products and dependencies based on .yaml
+             control files.
+License: GPL-3
+Depends: 
+  checkmate
+Imports:
+    magrittr,
+    dplyr
+RoxygenNote: 6.0.1
+Suggests: 
+    lintr,
+    testthat
