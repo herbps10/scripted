@@ -2,7 +2,7 @@
 % Please edit documentation in R/scripted.R
 \name{scripted}
 \alias{scripted}
-\title{Run files based on scripts... take N+1...}
+\title{Run scripts based on .yaml instructions}
 \usage{
 scripted(file, log_file = tempfile(), debug = FALSE)
 }
@@ -15,5 +15,5 @@ scripted(file, log_file = tempfile(), debug = FALSE)
 log_file where logs were written.
 }
 \description{
-Run files based on scripts... take N+1...
+Run scripts based on .yaml instructions
 }
