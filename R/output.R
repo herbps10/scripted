@@ -1,4 +1,20 @@
 
+
+setRefClass(Class = "output", 
+  fields = list(
+    type = "character",
+    data = function(x = NULL) {
+      if (!is.null(x))
+        stop("This object is not mutable.")
+      return(.data[['object']])
+    },
+    .data = "list"
+  ),
+  methods = list(
+    save = function() {
+  )
+)
+
 #' Save output
 #'
 #' @param job job description
@@ -6,15 +22,9 @@
 #' @param logger logger to write log to...
 #' @return NULL
 #' @export
-save_output <- function(job, output, logger) {
-  target_dir <- job[['target_dir']]
-  dir.create(path = target_dir, showWarnings = FALSE, recursive = TRUE)
-  output_files <- sapply(job[['outputs']], function(x) x[['file']])
-  output_names <- get_expectations(job, logger)
+save_output <- function(job, target_dir, output, logger) {
+  output_names = names(output)
   for (i in 1:length(output_names)) {
-    output_path <- file.path(target_dir, output_files[i])
-    if (file.exists(output_path))
-      next
     logger("Output extension: ", get_ext(output_path))
     if (get_ext(output_path) == 'rds') {
       saveRDS(output[[output_names[i]]], output_path)

@@ -1,4 +1,12 @@
 
+start = "START_LOGGER"
+debug = "DEBUG"
+info = "INFO"
+warn = "WARN"
+error = "ERROR"
+fatal = "FATAL"
+
+
 #' Return a closure with a log file set
 #'
 #' @param log_file where to write log to
@@ -6,11 +14,19 @@
 #' @export
 logger <- function(log_file = tempfile()) { 
   log_file <- log_file
-  log_f <- function(...) cat(paste0(..., collapse=", "), file = log_file, sep = "\n", append = TRUE)
-#  of = file(log_file, open = "wt")
-#  sink(type = 'message', file = of)
-  cat(paste0("Starting at: ", Sys.time(), "\n"), file = log_file)
-  return(log_f)
+  write_message = function(level, ...) {
+    msg = paste0(..., collapse=", ")
+    stamp = paste0("[", level, "] [", Sys.time(), "]")
+    text = paste(stamp, msg)
+    cat(text, file = log_file, sep = "\n", append = TRUE)
+    if (level == "WARN")
+      warning(text)
+    if (level == "ERROR" || level == "FATAL")
+      stop(text)
+    return(log_file)
+  }
+  write_message(start, "starting script")
+  return(write_message)
 }
 
 

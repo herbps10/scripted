@@ -1,81 +1,67 @@
 
 #' Run scripts based on .yaml instructions
+#'
+#' An instructions file is a .yaml file that is loaded as an
+#' R 'list'.  It contains two top-level elements: "defaults", and
+#' "runs".  The "defaults" element is a list describing a single 
+#' script to run.  The "runs" element is a list of lists.  Each item
+#' in this list describes a single script to run.  So:
+#'
+#' defaults:
+#'   [RUN DEFAULTS]
+#'
+#' runs:
+#'   - [RUN A]
+#'   - [RUN B]
+#'
+#' Before each run is ... run... the run-specific data is merged
+#' on top of the run defaults using purrr::list_merge.
+#'
+#' The elements of a run are:
+#'
+#' - name : the name of the script to run (without its extension).
+#' - parameters : (optional) a list where any script-specific control data
+#'                can be placed.
+#' - source_dir : a vector of strings, one per directory to search for
+#'                resources (data files _and_ scripts).
+#' - dependencies : a vector of strings, one per file required for the
+#'                  script to run.  If a dependency is update the script
+#'                  is re-run.
+#' - target_dir : the root of the directory where script outptu will
+#'                be saved, a single string.
+#' - outputs : 
 #' 
 #' @param file .yaml file with instructions, see example
 #' @param log_file where to write text log to.
 #' @return log_file where logs were written.
 #' @export
-scripted <- function(file, log_file = tempfile(), debug=FALSE) {
-  instructions <- yaml::yaml.load_file(file)
-  n_instructions <- length(instructions[['runs']])
-  log <- logger(log_file)
-  log("\n\nThere are ", n_instructions, " jobs.")
+scripted = function(file, target_dir = ".", log_file = tempfile(), debug=FALSE) {
+  instructions = yaml::yaml.load_file(file)
+  n_jobs = length(instructions[['runs']])
+  log = logger(log_file)
+  log(info, "There are ", n_jobs, " jobs.")
+  log(info, "Target directory is: ", target_dir)
 
-  for (i in 1:n_instructions) {
-    log("Instruction ", i)
-    job <- get_job(instructions, i, log)
-
-    log(paste("Search for dependencies in: ", job[['source_dir']]))
+  for (i in 1:n_jobs) {
+    job = get_job(instructions, i, log)
+    target_dir = create_target(job, target_dir, log)
+    check_file = create_check_file(target_dir, job, log)
     script_path = get_script(job, log)
+    load_script(script_path, debug, log)
 
-    log("Loading script.", script_path)
-    source(script_path, echo = debug)
-
-    log("Does the output target exist?")
-    target_dir <- job[['target_dir']]
-    if (!dir.exists(target_dir)) {
-      log("Target directory does not exist, creating: ", target_dir)
-      if (file.exists(target_dir) && file.info(target_dir)$isdir) {
-        log("Target directory path has a file.  Aborting.")
-        stop("Target directory path has a file. Aborting.")
-      } else {
-        dir.create(target_dir, recursive=TRUE)
-      }
-    }
-      
-
-    log("Get expected files.")
-    expected_files <- get_expected_files(job, log)
-    expectations_met <- file.exists(file.path(job[['target_dir']], expected_files))
-    if (all(expectations_met)) {
-      log("All outputs are present, skipping job.")
-      next
+    will_run = check_dependencies(job, check_file, log)
+    if (will_run) {
+      output = NULL
+      log(info, "Calling main function from '", script_path, "'.")
+      output = main(job)
     } else {
-      missing_expectations <- expected_files[!expectations_met]
-      for (f in missing_expectations) {
-        log("Need to produce ", f)
-      }
+      output = NULL
+      log(info, "Skipping main function from '", script_path, "'.")
     }
 
-    o <- NULL
-    log("Calling script-level main function.")
-    o <- main(job)
-
-    if (!is.null(o)) {
-      log("Objects in return are: ")
-      log(names(o))
-    } else {
-      log("No objects found in return.")
-    }
-
-    expected_objects <- get_expectations(job, log)
-    log("Expected objects are: ")
-    log(expected_objects)
-    if (all(expected_objects %in% names(o))) {
-      log("All output found.")
-    } else {
-      log("Some expected output is missing.")
-      missing_output <- expected_objects[!(expected_objects %in% names(o))]
-      for (missing in missing_output) {
-        log("Object named ", missing, " was not found.")
-      }
-    }
-
-    log("Saving output.")
-    log("Target directory is: ", job[['target_dir']])
-    save_output(job, o, log) 
-    log("Finished saving output.")
+    save_output(job, target_dir, output, log) 
   }
+  log_file = log(info, "Finished all jobs.")
   return(log_file)
 }
 
