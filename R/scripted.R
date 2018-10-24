@@ -59,7 +59,7 @@ scripted = function(file, target_dir = ".", log_file = tempfile(), debug=FALSE) 
       log(info, "Skipping main function from '", script_path, "'.")
     }
 
-    save_output(job, target_dir, output, log) 
+    save_output(target_dir, output) 
   }
   log_file = log(info, "Finished all jobs.")
   return(log_file)

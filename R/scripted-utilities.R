@@ -4,7 +4,7 @@
 #'
 #' This is not a fail-safe procedure.
 #'
-#' @param target_dir
+#' @param target_dir directory to look in.
 #' @return single-string character vector of the file name.
 check_file_path = function(target_dir, stub) {
   found_path = dir(path = target_dir, pattern = paste0(stub, ".*\\.check"),
@@ -23,7 +23,7 @@ check_file_path = function(target_dir, stub) {
 #' This is a .yaml file that records file content checksums
 #' and their modification times, etc... to verify whether a file
 #' is available and has been updated.
-#' @param target_dir
+#' @param target_dir directory to look in
 #' @return check file path
 create_check_file = function(target_dir, job, logger) {
   stub = paste0('scripted-target-', job[['name']])
@@ -63,7 +63,7 @@ check_dependencies = function(job, file, logger) {
       "Script will run.") 
     cs = list()
   }
-  dependency_files = job[['dependencies']
+  dependency_files = job[['dependencies']]
   dependency_paths = find_file(job[['source_dir']], dependency_files)
   dependency_files_found = basename(dependency_paths)
 
@@ -73,8 +73,8 @@ check_dependencies = function(job, file, logger) {
       logger(debug, "Found dependency '", dep, "'.")
     else {
       will_error = TRUE
-      for (s in job[['source_dir']]) {
-        logger(warn, "Searched in '" s, "'.")
+      for (s in job[['source_dir']])
+        logger(warn, "Searched in '", s, "'.")
       logger(warn, "Dependency not found: '", dep, "'.")
     }
   }

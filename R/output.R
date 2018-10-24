@@ -1,17 +1,37 @@
 
 
-setRefClass(Class = "output", 
+save = methods::setRefClass(Class = "output", 
   fields = list(
     type = "character",
     data = function(x = NULL) {
       if (!is.null(x))
         stop("This object is not mutable.")
-      return(.data[['object']])
+      return(.self$.data[['object']])
     },
-    .data = "list"
+    .data = "list",
+    .logger = "function"
+
   ),
   methods = list(
-    save = function() {
+    initialize = function(data, type, logger) {
+      .self$.name = as.character(substitute(data))
+      .self$.type = type
+      .self$.data = data
+      .self$.logger = logger
+    },
+    save = function(target_dir) {
+      if (.self$.format == 'rds') {
+        file = file.path(target_dir, paste0(.self$.name, '.rds'))
+        saveRDS(.self$.data, file)
+	.self$.logger(info, paste0(.self$.name, " saved as .rds"))
+      } else if (.self$.format == 'rdump') {
+	e = as.environment(.self$.data)
+	name_list = ls(e)
+        file = file.path(target_dir, paste0(.self$.name, '.rdump'))
+        rstan::stan_rdump(list = name_list, file = file, envir = e)
+	.self$.logger(info, paste0(.self$.name, " saved as .rdump"))
+      }
+    }
   )
 )
 
@@ -22,16 +42,9 @@ setRefClass(Class = "output",
 #' @param logger logger to write log to...
 #' @return NULL
 #' @export
-save_output <- function(job, target_dir, output, logger) {
-  output_names = names(output)
-  for (i in 1:length(output_names)) {
-    logger("Output extension: ", get_ext(output_path))
-    if (get_ext(output_path) == 'rds') {
-      saveRDS(output[[output_names[i]]], output_path)
-    } else if (get_ext(output_path) == 'rdump') {
-      rstan::stan_rdump(list = ls(output[[output_names[i]]]),
-        file = output_path, envir = output[[output_names[i]]])
-    } else logger("Output type not known for object: ", output_names[i])
+save_output <- function(target_dir, output) {
+  for (o in output) {
+    o$save(target_dir)
   }
   return(NULL)
 }

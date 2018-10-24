@@ -4,12 +4,12 @@
 \alias{save_output}
 \title{Save output}
 \usage{
-save_output(job, output, logger)
+save_output(target_dir, output)
 }
 \arguments{
-\item{job}{job description}
-
 \item{output}{list of output objects}
+
+\item{job}{job description}
 
 \item{logger}{logger to write log to...}
 }
