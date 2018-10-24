@@ -6,7 +6,7 @@
 #' @return job
 #' @export
 get_job = function(instructions, i, logger) {
-  job = instructions[['defaults']] %>% purrr::list_merge(instructions[['runs']][[i]])
+  job = purrr::list_merge(instructions[['defaults']], instructions[['runs']][[i]])
   logger(info, "Job name: ", job[[1]][['name']])
   return(job[[1]])
 }

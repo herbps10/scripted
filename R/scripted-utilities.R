@@ -49,6 +49,8 @@ create_check_file = function(target_dir, job, logger) {
 #' @param logger logger for output
 #' @return list with hash for each dependency
 check_dependencies = function(job, file, logger) {
+
+  # Check for previous check file.
   will_error = FALSE
   if (!file.exists(file))
     logger(error, "Check file ('", file, "') ",
@@ -63,6 +65,7 @@ check_dependencies = function(job, file, logger) {
       "Script will run.") 
     cs = list()
   }
+
   dependency_files = job[['dependencies']]
   dependency_paths = find_file(job[['source_dir']], dependency_files)
   dependency_files_found = basename(dependency_paths)

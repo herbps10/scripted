@@ -1,6 +1,6 @@
 
 
-save = methods::setRefClass(Class = "output", 
+store = methods::setRefClass(Class = "output", 
   fields = list(
     type = "character",
     data = function(x = NULL) {
@@ -14,7 +14,7 @@ save = methods::setRefClass(Class = "output",
   ),
   methods = list(
     initialize = function(data, type, logger) {
-      .self$.name = as.character(substitute(data))
+      .self$.name = gsub('_', '-', as.character(substitute(data)))
       .self$.type = type
       .self$.data = data
       .self$.logger = logger

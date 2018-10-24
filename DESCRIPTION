@@ -9,8 +9,9 @@ License: GPL-3
 Depends: 
   checkmate
 Imports:
-    magrittr,
-    dplyr
+    yaml,
+    openssl,
+    index
 RoxygenNote: 6.1.0
 Suggests: 
     lintr,
