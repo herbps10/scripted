@@ -48,6 +48,7 @@ create_check_file = function(target_dir, job, logger) {
 #' @param file path to check file
 #' @param logger logger for output
 #' @return list with hash for each dependency
+#' @importFrom indexer find_file
 check_dependencies = function(job, file, logger) {
 
   # Check for previous check file.
@@ -88,17 +89,13 @@ check_dependencies = function(job, file, logger) {
   new_cs = list()
   will_run = FALSE
   for (dep in dependency_paths) {
-    dep_name = basename(dep)
-    new_cs[[dep_name]] = openssl::md5(dep)
-  }
-  for (dep_name in names(new_cs)) {
-    if (!(dep_name %in% names(cs))) {
+    new_cs[[dep]] = openssl::md5(dep)
+    if (!(dep %in% names(cs))) {
       will_run = TRUE
-      logger(warn, "The dependency '", dep_name, "' is a new dependency. ",
+      logger(warn, "The dependency '", dep, "' is a new dependency. ",
         "Script will be run.")
-    }
-    if (new_cs[[dep_name]] != cs[[dep_name]]) {
-      logger(warn, "The dependency '", dpe_name, "' has been changed. ",
+    } else if (new_cs[[dep]] != cs[[dep]]) {
+      logger(warn, "The dependency '", dep, "' has been changed. ",
         "Script will be run.")
       will_run = TRUE
     }

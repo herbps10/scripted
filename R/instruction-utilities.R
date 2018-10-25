@@ -16,6 +16,7 @@ get_job = function(instructions, i, logger) {
 #' @param job job to get script from
 #' @param logger used to log output
 #' @return path to job script
+#' @importFrom indexer find_file
 #' @export
 get_script = function(job, logger) {
   script_file = paste0(job[['name']], ".R")

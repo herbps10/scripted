@@ -53,7 +53,7 @@ scripted = function(file, target_dir = ".", log_file = tempfile(), debug=FALSE) 
     if (will_run) {
       output = NULL
       log(info, "Calling main function from '", script_path, "'.")
-      output = main(job)
+      output = main(job, target_dir, log)
     } else {
       output = NULL
       log(info, "Skipping main function from '", script_path, "'.")
