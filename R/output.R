@@ -29,6 +29,8 @@ store = methods::setRefClass(Class = "output",
       .self$.logger = logger
     },
     save = function(target_dir) {
+      if (is.null(.self$data))
+	return()
       if (.self$.format == 'rds') {
         file = file.path(target_dir, paste0(.self$.name, '.rds'))
         saveRDS(.self$data, file)

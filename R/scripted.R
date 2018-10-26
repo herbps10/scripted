@@ -54,12 +54,11 @@ scripted = function(file, target_dir = ".", log_file = tempfile(), debug=FALSE) 
       output = NULL
       log(info, "Calling main function from '", script_path, "'.")
       output = main(job, target_dir, log)
+      save_output(target_dir, output) 
     } else {
-      output = NULL
       log(info, "Skipping main function from '", script_path, "'.")
     }
 
-    save_output(target_dir, output) 
   }
   log_file = log(info, "Finished all jobs.")
   return(log_file)

@@ -28,6 +28,8 @@ check_file_path = function(target_dir, stub) {
 create_check_file = function(target_dir, job, logger) {
   stub = paste0('scripted-target-', job[['name']])
   path = check_file_path(target_dir, stub)
+  if (file.exists(path))
+    return(path)
   cf_created = file.create(path, showWarnings = FALSE)
   if (!cf_created) {
     if (!file.exists(path)) {
