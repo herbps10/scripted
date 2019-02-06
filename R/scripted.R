@@ -46,7 +46,7 @@ scripted = function(file, target_dir = ".", log_file = tempfile(), debug=FALSE) 
     job = get_job(instructions, i, log)
     target_dir = create_target(job, target_dir, log)
     check_file = create_check_file(target_dir, job, log)
-    script_path = get_script(job, log)
+    script_path = unique(get_script(job, log))
     load_script(script_path, debug, log)
 
     will_run = check_dependencies(job, check_file, log)
